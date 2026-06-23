@@ -1,0 +1,7 @@
+db.sqlite3
+auth_app/migrations/
+offers_app/migrations/
+orders_app/migrations/
+profile_app/migrations/
+reviews_app/migrations/
+page_info_app/migrations/

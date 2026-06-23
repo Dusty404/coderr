@@ -3,11 +3,17 @@ from django.db import models
 
 
 class UserProfile(models.Model):
+    class AccountType(models.TextChoices):
+        CUSTOMER = "customer", "Customer"
+        BUSINESS = "business", "Business"
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         related_name="profile",
     )
-
-    def __str__(self):
-        return self.user.username
+    
+    type = models.CharField(
+        max_length=20,
+        choices=AccountType.choices,
+    )

@@ -15,7 +15,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     User and UserProfile IDs may be different.
     """
-    type = serializers.ChoiceField(choices=["customer", "busisness"])
+    type = serializers.ChoiceField(choices=["customer", "business"])
     repeated_password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -42,26 +42,57 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({
                 "email": "Email already exists."
             })
+        
+    def validate_username_is_unique(self, username):
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError({
+                "username": "Username already exists."
+            })
 
     def create(self, validated_data):
         """
         Coordinates the creation of a User and UserProfile in the database.
         """
         validated_data.pop("repeated_password")
+        account_type = validated_data.pop("type")
         user = self.create_user(validated_data)
-        self.create_profile(user, user.username)
+        self.create_profile(user, account_type)
         return user
 
     def create_user(self, validated_data):
-        email = validated_data["email"]
         return User.objects.create_user(
-            username=email,
-            email=email,
+            username=validated_data["username"],
+            email=validated_data["email"],
             password=validated_data["password"],
         )
 
-    def create_profile(self, user, username):
-        UserProfile.objects.create(
+    def create_profile(self, user, account_type):
+        return UserProfile.objects.create(
             user=user,
-            username=username,
+            username=user.username,
+            type=account_type
         )
+    
+class CustomLoginSerializer(serializers.Serializer):
+    username = serializers.CharField(
+        
+    )
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user_data = self.get_user_by_username(data.get("username"))
+        user = self.authenticate_user(user_data, data.get("password"))
+        data["user"] = user
+        return data
+
+    def get_user_by_username(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Ungültige Anfragedaten.")
+
+    def authenticate_user(self, user_data, password):
+        user = authenticate(username=user_data.username, password=password)
+        if not user:
+            raise serializers.ValidationError("Ungültige Anfragedaten.")
+        return user
