@@ -29,6 +29,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def validate(self, data):
         self.validate_passwords(data)
         self.validate_email_is_unique(data["email"])
+        self.validate_username_is_unique(data["username"])
         return data
 
     def validate_passwords(self, data):
@@ -69,7 +70,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def create_profile(self, user, account_type):
         return UserProfile.objects.create(
             user=user,
-            username=user.username,
             type=account_type
         )
     
