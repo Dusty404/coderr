@@ -10,7 +10,7 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")    
     type = models.CharField(max_length=20, choices=AccountType.choices)
-    file = models.FileField(upload_to='uploads/')
+    file = models.FileField(upload_to='uploads/profiles/')
     uploaded_at = models.DateTimeField(null=True, blank=True)
     location = models.CharField(max_length=255, default="")
     phone_validator = RegexValidator(regex=r'^[0-9+\-\s()]+$', message='Bitte eine gültige Telefonnummer eingeben.')
