@@ -23,6 +23,11 @@ class OfferPagination(PageNumberPagination):
 
 
 class OfferFilter(django_filters.FilterSet):
+    """
+    Defines filter options for the offer list.
+
+    The price and delivery filters use values annotated in the queryset.
+    """
     creator_id = django_filters.NumberFilter(field_name="user_id")
     min_price = django_filters.NumberFilter(method="filter_min_price")
     max_delivery_time = django_filters.NumberFilter(method="filter_max_delivery_time")
@@ -39,6 +44,12 @@ class OfferFilter(django_filters.FilterSet):
 
 
 class OffersViewSet(viewsets.ModelViewSet):
+    """
+    Provides list, detail, create, update and delete endpoints for offers.
+
+    All authenticated users can read offers. Business users can create offers.
+    Only the owner can update or delete an offer.
+    """
     queryset = Offer.objects.all()
     pagination_class = OfferPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -77,6 +88,10 @@ class OffersViewSet(viewsets.ModelViewSet):
         return SingleOfferSerializer
     
     def update(self, request, *args, **kwargs):
+        """
+        Update an offer with its nested package data.
+        Returns the full offer representation after saving.
+        """
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
 
@@ -92,6 +107,9 @@ class OffersViewSet(viewsets.ModelViewSet):
 
 
 class OfferDetailViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Provides read-only access to individual offer packages.
+    """
     queryset = OfferDetail.objects.all()
     serializer_class = OfferDetailsSerializer
     permission_classes = [IsAuthenticated]

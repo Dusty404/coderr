@@ -4,6 +4,11 @@ from django.utils import timezone
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Some fields are mapped from the related User model. 
+    The remaining fields are stored directly on UserProfile.
+    """
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True)
     last_name = serializers.CharField(source="user.last_name", required=False, allow_blank=True)
@@ -28,6 +33,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        """
+        Update profile fields and related User fields.
+        The upload timestamp is refreshed when a new file is submitted.
+        """
         user_data = validated_data.pop("user", {})
         new_file = validated_data.get("file")
 

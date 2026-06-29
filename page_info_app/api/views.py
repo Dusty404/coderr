@@ -8,8 +8,16 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
 class PageInfoView(APIView):
+    """
+    Provides public statistics for the platform overview.
+    """
     permission_classes = [AllowAny]
+
     def get(self, request):
+        """
+        Counts reviews, business profiles and offers.
+        The average review rating is rounded to one decimal place.
+        """
         data = {
             "review_count": Review.objects.count(),
             "average_rating": Review.objects.aggregate(avg_rating=Avg("rating"))["avg_rating"] or 0, 

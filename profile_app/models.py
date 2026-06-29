@@ -4,6 +4,12 @@ from django.db import models
 
 
 class UserProfile(models.Model):
+    """
+    Extends Django's User model with profile data.
+
+    The account type is used for role-based permissions. 
+    Contact data and public profile information are stored here as well.
+    """
     class AccountType(models.TextChoices):
         CUSTOMER = "customer", "Customer"
         BUSINESS = "business", "Business"

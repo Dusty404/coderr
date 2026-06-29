@@ -4,6 +4,9 @@ from profile_app.models import UserProfile
 
 
 class IsCustomerUser(permissions.BasePermission):
+    """
+    Allows order creation only for users with a customer profile.
+    """
     message = "Only customer accounts can create orders."
 
     def has_permission(self, request, view):
@@ -17,6 +20,9 @@ class IsCustomerUser(permissions.BasePermission):
 
 
 class IsBusinessUser(permissions.BasePermission):
+    """
+    Allows order updates only for users with a business profile.
+    """
     message = "Only business accounts can update orders."
 
     def has_permission(self, request, view):

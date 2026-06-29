@@ -4,6 +4,9 @@ from ..models import Order
 
 
 class OrderCreateSerializer(serializers.Serializer):
+    """
+    Validates the selected offer package before creating an order.
+    """
     offer_detail_id = serializers.IntegerField()
 
     def validate_offer_detail_id(self, value):
@@ -32,6 +35,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderStatusSerializer(serializers.ModelSerializer):
+    """
+    Limits order updates to the status field.
+    """
     class Meta:
         model = Order
         fields = ['status']

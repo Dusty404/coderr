@@ -10,19 +10,18 @@ from .serializers import RegistrationSerializer, CustomLoginSerializer
 
 class RegistrationView(APIView):
     """
-    Handles user registration.
+    Handles registration for new users.
 
-    Creates a new User and UserProfile, generates an authentication token,
-    and returns the user's authentication data.
+    The serializer validates the request data and creates the matching
+    UserProfile. A successful response returns the token and basic user data.
     """
     permission_classes = [AllowAny]
     serializer_class = RegistrationSerializer
 
     def post(self, request):
         """
-        Validates registration data and creates a new user account.
-
-        Returns authentication data on success or a validation error on failure.
+        Validate the registration request and create the user account.
+        Returns authentication data when the account was created.
         """
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -32,10 +31,7 @@ class RegistrationView(APIView):
                 self.get_auth_response_data(user),
                 status=status.HTTP_201_CREATED,
             )
-        return Response(
-            {"detail": "Ungültige Anfragedaten."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def get_auth_response_data(self, user):
         token, created = Token.objects.get_or_create(user=user)
@@ -48,9 +44,9 @@ class RegistrationView(APIView):
     
 class CustomLoginView(ObtainAuthToken):
     """
-    Handles user authentication.
+    Handles token based login for existing users.
 
-    Validates login credentials and returns an authentication token and user information.
+    The response contains the authentication token and basic user data.
     """
     permission_classes = [AllowAny]
     serializer_class = CustomLoginSerializer
@@ -63,10 +59,7 @@ class CustomLoginView(ObtainAuthToken):
                 self.get_auth_response_data(user),
                 status=status.HTTP_200_OK,
             )
-        return Response(
-            {"detail": "Ungültige Anfragedaten."},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def get_auth_response_data(self, user):
         token, created = Token.objects.get_or_create(user=user)
@@ -76,12 +69,3 @@ class CustomLoginView(ObtainAuthToken):
             "email": user.email,
             "user_id": user.id,
         }
-
-
-class LogoutView(APIView):
-    def post(self, request):
-        request.user.auth_token.delete()
-        return Response(
-            {"detail": "Logout erfolgreich."},
-            status=status.HTTP_200_OK,
-        )

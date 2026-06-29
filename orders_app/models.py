@@ -4,6 +4,12 @@ from offers_app.models import OfferDetail
 
 
 class Order(models.Model):
+        """
+        Represents an order created from a selected offer package.
+
+        Package values are copied from OfferDetail when the order is created.
+        This keeps the order stable if the original offer changes later.
+        """
         customer_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="customer_orders")
         business_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="business_orders")
         offer_detail = models.ForeignKey(OfferDetail, on_delete=models.CASCADE, related_name="orders")

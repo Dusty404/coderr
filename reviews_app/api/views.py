@@ -10,6 +10,9 @@ from .serializers import ReviewSerializer, ReviewUpdateSerializer
 
 
 class ReviewFilter(django_filters.FilterSet):
+    """
+    Defines filter options for reviewed business and reviewer.
+    """
     business_user_id = django_filters.NumberFilter(field_name="business_user_id")
     reviewer_id = django_filters.NumberFilter(field_name="reviewer_id")
 
@@ -19,6 +22,12 @@ class ReviewFilter(django_filters.FilterSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """
+    Provides list, create, update and delete endpoints for reviews.
+
+    Customer users can create reviews. Review owners can update or delete
+    their own reviews. Authenticated users can read reviews.
+    """
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_class = ReviewFilter
     ordering_fields = ["updated_at", "rating"]
@@ -44,6 +53,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return ReviewSerializer
 
     def update(self, request, *args, **kwargs):
+        """
+        Update editable review fields and return the full review response.
+        """
         partial = kwargs.pop("partial", False)
         review = self.get_object()
 

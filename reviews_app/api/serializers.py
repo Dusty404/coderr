@@ -5,6 +5,12 @@ from ..models import Review
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """
+    Serializes reviews and validates creation rules.
+
+    Reviews can only target business users. 
+    A customer can review the same business only once.
+    """
     class Meta:
         model = Review
         fields = [
@@ -19,6 +25,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "reviewer", "created_at", "updated_at"]
 
     def validate_business_user(self, value):
+        """
+        Ensure the selected review target has a business profile.
+        """
         try:
             is_business_user = value.profile.type == UserProfile.AccountType.BUSINESS
         except UserProfile.DoesNotExist:
@@ -30,6 +39,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
+        """
+        Prevent duplicate reviews from the same customer for one business.
+        """
         request = self.context.get("request")
 
         if request and request.method == "POST":
@@ -47,6 +59,9 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ReviewUpdateSerializer(serializers.ModelSerializer):
+    """
+    Limits review updates to rating and description.
+    """
     class Meta:
         model = Review
         fields = ["rating", "description"]

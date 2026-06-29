@@ -4,6 +4,9 @@ from profile_app.models import UserProfile
 
 
 class IsCustomerUser(permissions.BasePermission):
+    """
+    Allows review creation only for users with a customer profile.
+    """
     message = "Only customer accounts can create reviews."
 
     def has_permission(self, request, view):
@@ -17,6 +20,9 @@ class IsCustomerUser(permissions.BasePermission):
 
 
 class IsReviewOwner(permissions.BasePermission):
+    """
+    Allows review changes only for the user who created the review.
+    """
     message = "Only the reviewer can update or delete this review."
 
     def has_object_permission(self, request, view, obj):

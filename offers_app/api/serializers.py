@@ -36,6 +36,12 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
 
 class OfferListSerializer(serializers.ModelSerializer):
+    """
+    Serializes offers for list responses.
+
+    The response includes package links, the minimum package price and the
+    shortest delivery time.
+    """
     details = OfferDetailLinkSerializer(many=True, read_only=True)
     min_price = serializers.SerializerMethodField()
     min_delivery_time = serializers.SerializerMethodField()
@@ -77,10 +83,10 @@ class OfferListSerializer(serializers.ModelSerializer):
 
 
 class DetailsAsURLSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="offerdetails-detail",
-        read_only=True,
-    )
+    """
+    Represents an offer package as a hyperlink.
+    """
+    url = serializers.HyperlinkedIdentityField(view_name="offerdetails-detail", read_only=True)
 
     class Meta:
         model = OfferDetail
@@ -107,10 +113,19 @@ class SingleOfferSerializer(OfferListSerializer):
 
 
 class SingleDetailViewSerializer(OfferListSerializer):
+    """
+    Serializes an offer with fully embedded package details.
+    """
     details = OfferDetailsSerializer(many=True, read_only=True)
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
+    """
+    Handles creating and updating offers with details.
+
+    A new offer must include at least three details. During updates, existing
+    detail records are matched by their offer_type.
+    """
     details = OfferDetailsSerializer(many=True)
 
     class Meta:
@@ -124,6 +139,9 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        """
+        Create the offer and all submitted details.
+        """
         details_data = validated_data.pop("details", [])
 
         if len(details_data) < 3:
@@ -139,6 +157,9 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         return offer
 
     def update(self, instance, validated_data):
+        """
+        Update offer fields and matching detail records.
+        """
         details_data = validated_data.pop("details", None)
 
         for field, value in validated_data.items():

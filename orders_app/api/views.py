@@ -13,9 +13,18 @@ from ..models import Order
 
 
 class OrderViewSet(viewsets.ModelViewSet):
+    """
+    Provides order endpoints for customers, business users and admins.
+
+    Customers create orders from offer packages. Business users update order
+    status. Admin users can delete orders.
+    """
     serializer_class = OrderSerializer
 
     def get_permissions(self):
+        """
+        Select permissions based on the current ViewSet action.
+        """
         if self.action == "create":
             permission_classes = [IsAuthenticated, IsCustomerUser]
         elif self.action in ["partial_update", "update"]:
@@ -28,6 +37,9 @@ class OrderViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
+        """
+        Select a serializer for creation, status updates or read responses.
+        """
         if self.action == "create":
             return OrderCreateSerializer
 
@@ -37,12 +49,20 @@ class OrderViewSet(viewsets.ModelViewSet):
         return OrderSerializer
 
     def get_queryset(self):
+        """
+        Return orders where the current user is customer or business user.
+        Deletion uses the full queryset because it is restricted to admins.
+        """
         if self.action == "destroy":
             return Order.objects.all()
         user = self.request.user
         return Order.objects.filter(customer_user=user) | Order.objects.filter(business_user=user)
 
     def create(self, request, *args, **kwargs):
+        """
+        Create an order from the selected offer package.
+        The package data is copied into the order as a snapshot.
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -78,6 +98,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class BusinessUserOrderCountView(APIView):
+    """
+    Returns the total order count for a business user.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
@@ -92,6 +115,9 @@ class BusinessUserOrderCountView(APIView):
     
 
 class BusinessUserCompletedOrderCountView(APIView):
+    """
+    Returns the completed order count for a business user.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):

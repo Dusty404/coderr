@@ -5,15 +5,10 @@ from profile_app.models import UserProfile
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """
-    Validates data for creating a new account in the database.
+    Validates and creates a new user account.
 
-    Returns an error if the provided email address already exists.
-
-    Creates two database entries:
-    - User for login credentials
-    - UserProfile for all board, task, and comment relations
-
-    User and UserProfile IDs may be different.
+    Login credentials are stored in Django's User model. The selected account
+    type is stored in the related UserProfile.
     """
     type = serializers.ChoiceField(choices=["customer", "business"])
     repeated_password = serializers.CharField(write_only=True)
@@ -52,7 +47,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Coordinates the creation of a User and UserProfile in the database.
+        Create the Django user and attach the selected profile type.
         """
         validated_data.pop("repeated_password")
         account_type = validated_data.pop("type")
@@ -74,6 +69,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
     
 class CustomLoginSerializer(serializers.Serializer):
+    """
+    Validates username and password for token login.
+
+    Unknown users and wrong passwords return the same generic validation error.
+    """
     username = serializers.CharField(
         
     )

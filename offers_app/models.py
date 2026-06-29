@@ -2,6 +2,12 @@ from django.contrib.auth.models import User
 from django.db import models
 
 class Offer(models.Model):
+    """
+    Represents a service offer created by a business user.
+
+    The model stores general offer data such as title, image and description.
+    Package-specific data is stored in related OfferDetail objects.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="offers")
     title = models.CharField(max_length=255)
     image = models.FileField(upload_to='uploads/offers/', null=True, blank=True)
@@ -11,6 +17,12 @@ class Offer(models.Model):
 
 
 class OfferDetail(models.Model):
+    """
+    Represents one package tier of an offer.
+
+    Each package contains its own price, delivery time, revision count and
+    feature list.
+    """
     BASIC = "basic"
     STANDARD = "standard"
     PREMIUM = "premium"

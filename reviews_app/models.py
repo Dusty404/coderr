@@ -4,6 +4,12 @@ from django.contrib.auth.models import User
 
 
 class Review(models.Model):
+    """
+    Represents a customer review for a business user.
+
+    Each review links the reviewed business with the customer who wrote it.
+    Ratings are limited to values between 1 and 5.
+    """
     business_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviewed_business")
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviewer")
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
