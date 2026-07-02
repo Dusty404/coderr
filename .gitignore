@@ -21,3 +21,5 @@ orders_app/api/__pycache__
 profile_app/api/__pycache__
 reviews_app/api/__pycache__
 page_info_app/api/__pycache__
+core/__pycache__/settings.cpython-314.pyc
+offers_app/api/__pycache__/views.cpython-314.pyc
