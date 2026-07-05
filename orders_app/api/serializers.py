@@ -1,18 +1,12 @@
 from rest_framework import serializers
-from offers_app.models import OfferDetail
 from ..models import Order
 
 
 class OrderCreateSerializer(serializers.Serializer):
     """
-    Validates the selected offer package before creating an order.
+    Validates the offer detail id before creating an order.
     """
     offer_detail_id = serializers.IntegerField()
-
-    def validate_offer_detail_id(self, value):
-        if not OfferDetail.objects.filter(id=value).exists():
-            raise serializers.ValidationError("Offer detail does not exist.")
-        return value
     
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -41,3 +35,16 @@ class OrderStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['status']
+
+    def validate(self, attrs):
+        allowed_fields = {"status"}
+        received_fields = set(self.initial_data.keys())
+
+        unknown_fields = received_fields - allowed_fields
+        if unknown_fields:
+            raise serializers.ValidationError({
+                field: "Dieses Feld darf nicht geändert werden."
+                for field in unknown_fields
+            })
+
+        return attrs

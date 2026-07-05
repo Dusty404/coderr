@@ -3,7 +3,7 @@ from django.db.models import Min
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from ..models import Offer, OfferDetail
@@ -61,21 +61,18 @@ class OffersViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == "create":
             permission_classes = [IsAuthenticated, IsBusinessUser]
+        elif self.action == "retrieve":
+            permission_classes = [IsAuthenticated]
         elif self.action in ["update", "partial_update", "destroy"]:
             permission_classes = [IsAuthenticated, IsOfferOwner]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
 
         return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         return (
-            Offer.objects.select_related("user")
-            .prefetch_related("details")
-            .annotate(
-                min_price=Min("details__price"),
-                min_delivery_time=Min("details__delivery_time_in_days"),
-            )
+            Offer.objects.select_related("user").prefetch_related("details").annotate(min_price=Min("details__price"), min_delivery_time=Min("details__delivery_time_in_days"))
         )
 
     def get_serializer_class(self):

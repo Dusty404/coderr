@@ -1,6 +1,7 @@
+import os
 from rest_framework import serializers
-from ..models import UserProfile
 from django.utils import timezone
+from ..models import UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -31,6 +32,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "uploaded_at",
         ]
+
+
+    def validate_file(self, value):
+        allowed_extensions = [".jpg", ".jpeg", ".png", ".webp"]
+        extension = os.path.splitext(value.name)[1].lower()
+
+        if extension not in allowed_extensions:
+            raise serializers.ValidationError(
+                "Nur JPG-, PNG- oder WEBP-Bilder sind erlaubt."
+            )
+
+        return value
 
     def update(self, instance, validated_data):
         """

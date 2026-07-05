@@ -2,10 +2,10 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .permissions import IsBusinessUser, IsCustomerUser
+from .permissions import IsAdminUserObjectPermission, IsBusinessUser, IsOrderRelatedBusiness, IsCustomerUser
 from offers_app.models import OfferDetail
 from profile_app.models import UserProfile
 from .serializers import OrderSerializer, OrderCreateSerializer, OrderStatusSerializer
@@ -28,9 +28,9 @@ class OrderViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             permission_classes = [IsAuthenticated, IsCustomerUser]
         elif self.action in ["partial_update", "update"]:
-            permission_classes = [IsAuthenticated, IsBusinessUser]
+            permission_classes = [IsAuthenticated, IsBusinessUser, IsOrderRelatedBusiness]
         elif self.action == "destroy":
-            permission_classes = [IsAdminUser]
+            permission_classes = [IsAuthenticated, IsAdminUserObjectPermission]
         else:
             permission_classes = [IsAuthenticated]
 
@@ -56,7 +56,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if self.action == "destroy":
             return Order.objects.all()
         user = self.request.user
-        return Order.objects.filter(customer_user=user) | Order.objects.filter(business_user=user)
+        return Order.objects.all()
 
     def create(self, request, *args, **kwargs):
         """
@@ -66,10 +66,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        offer_detail = OfferDetail.objects.select_related("offer__user").get(
-            id=serializer.validated_data["offer_detail_id"]
-        )
-
+        offer_detail = get_object_or_404(OfferDetail.objects.select_related("offer__user"), id=serializer.validated_data["offer_detail_id"])
         order = Order.objects.create(
             customer_user=request.user,
             business_user=offer_detail.offer.user,
