@@ -1,11 +1,12 @@
 from rest_framework.views import APIView
-from django.db.models import Avg
-from profile_app.models import UserProfile
-from .serializers import PageStatisticsSerializer
-from reviews_app.models import Review
-from offers_app.models import Offer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from django.db.models import Avg
+
+from profile_app.models import UserProfile
+from reviews_app.models import Review
+from offers_app.models import Offer
+from .serializers import PageStatisticsSerializer
 
 class PageInfoView(APIView):
     """

@@ -7,12 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 from ..models import Offer, OfferDetail
-from .serializers import (
-    OfferDetailsSerializer,
-    OfferListSerializer,
-    OfferCreateSerializer,
-    SingleOfferSerializer,
-)
+from .serializers import (OfferDetailsSerializer, OfferListSerializer, OfferCreateSerializer, SingleOfferSerializer)
 from .permissions import IsBusinessUser, IsOfferOwner
 
 
