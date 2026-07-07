@@ -98,7 +98,6 @@ class BusinessUserOrderCountView(APIView):
     """
     Returns the total order count for a business user.
     """
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
         business_user = get_object_or_404(
@@ -115,7 +114,6 @@ class BusinessUserCompletedOrderCountView(APIView):
     """
     Returns the completed order count for a business user.
     """
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
         business_user = get_object_or_404(
@@ -124,6 +122,6 @@ class BusinessUserCompletedOrderCountView(APIView):
             profile__type=UserProfile.AccountType.BUSINESS,
         )
         orders = Order.objects.filter(business_user=business_user)
-        completed_orders_count = orders.filter(status='completed').count()
+        completed_order_count = orders.filter(status='completed').count()
 
-        return Response({"completed_orders_count": completed_orders_count})
+        return Response({"completed_order_count": completed_order_count})

@@ -25,7 +25,7 @@ class IsBusinessUser(permissions.BasePermission):
     """
     message = "Only business accounts can update orders."
 
-    def has_permission(self, request, view):
+    def has_object_permission(self, request, view, obj):
         if not request.user or not request.user.is_authenticated:
             return False
 
