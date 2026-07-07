@@ -105,7 +105,8 @@ class BusinessUserOrderCountView(APIView):
             id=business_user_id,
             profile__type=UserProfile.AccountType.BUSINESS,
         )
-        order_count = Order.objects.filter(business_user=business_user).count()
+        orders = Order.objects.filter(business_user=business_user)
+        order_count = orders.filter(status='in_progress').count()
 
         return Response({"order_count": order_count})
     
